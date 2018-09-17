@@ -14,3 +14,4 @@ class CrawlerItem(scrapy.Item):
     text = scrapy.Field()
     author = scrapy.Field()
     keywords = scrapy.Field()
+    resource = scrapy.Field()

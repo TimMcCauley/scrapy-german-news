@@ -44,4 +44,5 @@ class FazSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.xpath('//div[@class="FAZArtikelText"]/div/p/text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//span[@class="Autor"]/span[@class="caps last"]/a/span/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
+        item['resource']=self.name
         return item

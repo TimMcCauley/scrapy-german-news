@@ -45,4 +45,5 @@ class SternSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.css('.article-content>.rtf-content-wrapper>P').xpath('.//text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//div[@class="name"]/a[@rel="author"]/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="news_keywords"]/@content').extract()]
+        item['resource'] = self.name
         return item

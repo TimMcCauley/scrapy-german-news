@@ -3,6 +3,34 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import psycopg2
 import json
+import pymongo
+
+
+class MongoPipeline(object):
+    """Pipeline for writing to a Mongo DB"""
+    collection_name = 'scrapy_items'
+
+    def __init__(self, mongo_uri, mongo_db):
+        self.mongo_uri = mongo_uri
+        self.mongo_db = mongo_db
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            mongo_uri=crawler.settings.get('MONGO_URI'),
+            mongo_db=crawler.settings.get('MONGO_DATABASE')
+        )
+
+    def open_spider(self, spider):
+        self.client = pymongo.MongoClient(self.mongo_uri)
+        self.db = self.client[self.mongo_db]
+
+    def close_spider(self, spider):
+        self.client.close()
+
+    def process_item(self, item, spider):
+        self.db[self.collection_name].insert_one(dict(item))
+        return item
 
 
 class JsonWriterPipeline(object):
@@ -21,7 +49,7 @@ class PostgresPipeline(object):
     def __init__(self, db_name, db_user, db_host, db_port, db_password):
         """Initialize the data base"""
         try:
-            # Connect to the db using options set in settings.py 
+            # Connect to the db using options set in settings.py
             self.db = psycopg2.connect("dbname="+db_name+" user="+db_user+" host="+db_host+" port="+db_port+" password="+db_password)
         except psycopg2.DatabaseError as e:
             print(e)

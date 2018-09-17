@@ -45,4 +45,5 @@ class SZSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.css('.article>.body>p').xpath('.//text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.css('.authorContainer').xpath('.//span/strong/span/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="news_keywords"]/@content').extract()]
+        item['resource'] = self.name
         return item

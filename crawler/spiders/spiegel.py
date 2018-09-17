@@ -46,4 +46,5 @@ class SpiegelSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.xpath('//div[@class="article-section clearfix"]/p/text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//p[@class="author"]/a/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="news_keywords"]/@content').extract()]
+        item['resource'] = self.name
         return item

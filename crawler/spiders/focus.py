@@ -42,4 +42,5 @@ class FocusSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.css('.articleContent').xpath('.//div[@class="textBlock"]/p/text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//a[@rel="author"]/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
+        item['resource'] = self.name
         return item

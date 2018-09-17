@@ -46,4 +46,5 @@ class HandelsblattSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.css('.vhb-article-content p').xpath('.//text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('.//a[@rel="author"]/span[@itemprop="name"]/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
+        item['resource'] = self.name
         return item

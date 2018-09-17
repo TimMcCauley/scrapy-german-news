@@ -48,4 +48,5 @@ class RPOnlineSpider(CrawlSpider):
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.xpath('//div[@class="main-text "]/p/text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="author"]/@content').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
+        item['resource'] = self.name
         return item

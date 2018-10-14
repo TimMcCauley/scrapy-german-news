@@ -38,10 +38,10 @@ class FazSpider(CrawlSpider):
         item = CrawlerItem()
         item['url'] = response.url.encode('utf-8')
         item['visited'] = datetime.datetime.now().isoformat().encode('utf-8')
-        item['published'] = get_first(response.selector.xpath('//span[@class="Datum"]/@content').extract())
+        item['published'] = get_first(response.selector.xpath('//time/@datetime').extract())
         item['title'] = get_first(response.selector.xpath('//meta[@property="og:title"]/@content').extract())
         item['description'] = get_first(response.selector.xpath('//meta[@property="og:description"]/@content').extract()).strip()
-        item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.xpath('//div[@class="FAZArtikelText"]/div/p/text()').extract()])
+        item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.xpath('//div[@class="atc-Text "]/p[@class="atc-TextParagraph"]/text()').extract()])
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//span[@class="Autor"]/span[@class="caps last"]/a/span/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
         item['resource']=self.name

@@ -73,7 +73,8 @@ USER_AGENT_CHOICES = [
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'crawler.pipelines.MongoPipeline':100,
+    'crawler.pipelines.KafkaPipeline':100
+    #'crawler.pipelines.MongoPipeline':200,
     # 'crawler.pipelines.PostgresPipeline': 300,
     # 'crawler.pipelines.JsonWriterPipeline': 800,
 }
@@ -107,6 +108,10 @@ DATABASE = {
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-MONGO_DATABASE='german_news'
+MONGO_DATABASE='test'
 
-MONGO_URI=''
+MONGO_URI='mongodb://127.0.0.1:27017'
+
+KAFKA_SERVER='localhost:9092'
+
+KAFKA_TOPIC='scraped_news'

@@ -36,7 +36,7 @@ class FocusSpider(CrawlSpider):
         item = CrawlerItem()
         item['url'] = response.url.encode('utf-8')
         item['visited'] = datetime.datetime.now().isoformat().encode('utf-8')
-        item['published'] = get_first(response.selector.xpath('//meta[@name="date"]/@content').extract())
+        item['published'] = get_first(response.selector.xpath('//li[@class="atc-MetaItem atc-MetaItem-time-of-publication"]/time/@datetime').extract())
         item['title'] = get_first(response.selector.xpath('//meta[@property="og:title"]/@content').extract())
         item['description'] = get_first(response.selector.xpath('//meta[@name="description"]/@content').extract())
         item['text'] = "".join([s.strip().encode('utf-8') for s in response.selector.css('.articleContent').xpath('.//div[@class="textBlock"]/p/text()').extract()])

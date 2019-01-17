@@ -4,6 +4,9 @@
 #import psycopg2
 import json
 import pymongo
+import kafka
+import hashlib
+from bson.json_util import dumps
 
 
 class MongoPipeline(object):
@@ -42,6 +45,36 @@ class JsonWriterPipeline(object):
         line = json.dumps(dict(item)) + "\n"
         self.file.write(line)
         return item
+
+
+class KafkaPipeline(object):
+    """Pipeline for writing to a Mongo DB"""
+
+    def __init__(self, kafka_server, kafka_topic):
+        self.kafka_server = kafka_server
+        self.kafka_topic = kafka_topic
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            kafka_server=crawler.settings.get('KAFKA_SERVER'),
+            kafka_topic=crawler.settings.get('KAFKA_TOPIC')
+        )
+
+    def open_spider(self, spider):
+        self.producer = kafka.KafkaProducer(bootstrap_servers=[self.kafka_server], api_version=(0, 10))
+
+    def close_spider(self, spider):
+        self.client.close()
+
+    def process_item(self, item, spider):
+        key=hashlib.md5((str(item['url'])+str(item['published'])))
+        key_bytes = key.hexdigest()
+        value_bytes = dumps(item).encode("utf-8")
+        self.producer.send(self.kafka_topic, key=key_bytes, value=value_bytes)
+        self.producer.flush()
+        return item
+
 
 # class PostgresPipeline(object):
 #     """Pipeline for writing to a PostgreSQL data base"""

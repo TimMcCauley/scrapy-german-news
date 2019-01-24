@@ -68,8 +68,8 @@ class KafkaPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        key=hashlib.md5((str(item['url'])+str(item['published'])))
-        key_bytes = key.hexdigest()
+        key=item['publication_id']
+        key_bytes = key.encode("utf-8")
         value_bytes = dumps(item).encode("utf-8")
         self.producer.send(self.kafka_topic, key=key_bytes, value=value_bytes)
         self.producer.flush()
@@ -80,6 +80,7 @@ class KafkaPipeline(object):
 #     """Pipeline for writing to a PostgreSQL data base"""
 #
 #     def __init__(self, db_name, db_user, db_host, db_port, db_password):
+#         """Initialize the data base"""
 #         """Initialize the data base"""
 #         try:
 #             # Connect to the db using options set in settings.py

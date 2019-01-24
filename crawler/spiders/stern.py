@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import hashlib
 
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
@@ -46,4 +47,5 @@ class SternSpider(CrawlSpider):
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//div[@class="name"]/a[@rel="author"]/text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="news_keywords"]/@content').extract()]
         item['resource'] = self.name
+        item['publication_id'] = hashlib.sha1((str(item['url']) + str(item['published'])))
         return item

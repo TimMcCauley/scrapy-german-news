@@ -15,3 +15,4 @@ class CrawlerItem(scrapy.Item):
     author = scrapy.Field()
     keywords = scrapy.Field()
     resource = scrapy.Field()
+    publication_id=scrapy.Field()

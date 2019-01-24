@@ -50,5 +50,5 @@ class RPOnlineSpider(CrawlSpider):
         item['author'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="author"]/@content').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
         item['resource'] = self.name
-        item['publication_id'] = hashlib.sha1((str(item['url'])+str(item['published'])))
+        item['publication_id'] = str(hashlib.sha1((str(item['url'])+str(item['published']))))
         return item

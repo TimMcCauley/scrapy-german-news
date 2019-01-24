@@ -50,7 +50,7 @@ class ZeitSpider(CrawlSpider):
         item['author'] = [s.encode('utf-8') for s in response.selector.css('.byline').css('span[itemprop="name"]').xpath('./text()').extract()]
         item['keywords'] = [s.encode('utf-8') for s in response.selector.xpath('//meta[@name="keywords"]/@content').extract()]
         item['resource'] = self.name
-        item['publication_id'] = hashlib.sha1((str(item['url']) + str(item['published'])))
+        item['publication_id'] = str(hashlib.sha1((str(item['url']) + str(item['published']))))
         # Handle next pages
         next_page = get_first(response.selector.xpath('//link[@rel="next"]/@href').extract())
         if next_page:

@@ -1,6 +1,6 @@
 # scrapy-german-news
 Collection of spiders crawling articles on major German news sites for the Scrapy application framework.
-The spiders are usable as is, crawled data can be written to a PostgreSQL data base using the python psycopg2 package or to a file as JSON.
+The spiders are usable as is, crawled data can be written to a PostgreSQL data base using the python psycopg2 package, MongoDB using pymongo, Kafka using kafka package or to a file as JSON.
 
 ## Table of Contents
 * [Introduction](#introduction)
@@ -22,7 +22,6 @@ The spiders are usable as is, crawled data can be written to a PostgreSQL data b
 This is a collection of spiders for the Scrapy application framework.
 The spiders cover major German news sites.
 The repository includes a middleware for rotating user agents and two output pipelines:
-Writing to a PostgreSQL data base using the psycopg2 package and writing to a file in a JSON like structure. 
 
 <a name="covered_sites"/>
 ### Covered Sites
@@ -50,6 +49,7 @@ Following information is extracted from these sites:
 * Date crawled
 * Short description
 * Full text
+* Resource (or shortcut for crawled news site)
 
 <a name="installation"/>
 ## Installation
@@ -68,10 +68,6 @@ Psycopg2 is used for a pipeline to write the results to a PostgreSQL data base a
 ### Requirements
 * Python 2.7 (Scrapy is not yet released for Python 3)
 * Scrapy 1.0 ([website](http://scrapy.org/), [github](https://github.com/scrapy/scrapy), [doc](http://doc.scrapy.org/en/1.0/))
-
-If the data base pipeline is used (Else you can remove it from `crawler/pipelines.py`):
-* Psycopg2 ([website](http://initd.org/psycopg/), [github](https://github.com/psycopg/psycopg2/),[doc](http://initd.org/psycopg/docs/))
-* PostgreSQL 9.5 ([website](http://www.postgresql.org/), [wiki](https://wiki.postgresql.org/wiki/Main_Page), [doc](http://www.postgresql.org/docs/9.5/interactive/index.html))
 
 <a name="configuration"/>
 ## Configuration
@@ -114,33 +110,17 @@ Change them or add your own as needed.
 
 <a name="output"/>
 ### Output
-Two different output methods are provided; writing to a PostgreSQL data base and writing to a file as JSON.
+Two different output methods are provided; writing to a PostgreSQL data base, MongoDB, Kafka and writing to a file as JSON.
 The methods are implemented in `crawler/pipelines.py`
 To choose a method comment/uncomment the lines in `crawler/settings.py` as needed:
 ```python
 ITEM_PIPELINES = {
-    'crawler.pipelines.PostgresPipeline': 300,
+      'crawler.pipelines.KafkaPipeline':100
+    # 'crawler.pipelines.MongoPipeline':200,
+    # 'crawler.pipelines.PostgresPipeline': 300,
     # 'crawler.pipelines.JsonWriterPipeline': 800,
 }
 ```
-#### Database
-The settings for the data base are defined in the `crawler/settings.py`:
-```python
-DATABASE = {
-    'drivername': 'postgres',
-    'host': 'localhost',
-    'port': '5432',
-    'username': 'postgres',
-    'password': 'password',
-    'database': 'crawler'
-}
-```
-The pipeline writes to a table with the name of the spider (Creates one if it does not already exists).
-Pages that were already crawled are recognized (By the URL) and ignored.
-
-#### JSON
-This pipeline writes the crawled items to a file called `items.json` in a notation similar to JSON.
-Filename can be changed in `crawler/pipelines.py`.
 
 <a name="categories"/>
 ### Categories

@@ -2,26 +2,32 @@
 # Definition of item pipelines
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 #import psycopg2
+import datetime
 import json
 import pymongo
 import kafka
-import hashlib
 from bson.json_util import dumps
+from scrapy.exceptions import DropItem
 
 
 class MongoPipeline(object):
     """Pipeline for writing to a Mongo DB"""
-    collection_name = 'german_news'
-
-    def __init__(self, mongo_uri, mongo_db):
+    def __init__(self, mongo_uri, mongo_db, mongo_collection, publication_min_date):
         self.mongo_uri = mongo_uri
         self.mongo_db = mongo_db
+        self.mongo_collection=mongo_collection
+        self.publication_min_date=publication_min_date
+        self.ids_seen = set()
 
     @classmethod
     def from_crawler(cls, crawler):
+        mongo_settings=crawler.settings.get('MONGO')
+        y, m, d = [int(t) for t in mongo_settings.get('publication_min_date').split('-')]
         return cls(
-            mongo_uri=crawler.settings.get('MONGO_URI'),
-            mongo_db=crawler.settings.get('MONGO_DATABASE')
+            mongo_uri=mongo_settings.get('uri'),
+            mongo_db=mongo_settings.get('db'),
+            mongo_collection=mongo_settings.get('collection'),
+            publication_min_date=datetime.date(y,m,d).isoformat().encode('utf-8')
         )
 
     def open_spider(self, spider):
@@ -32,33 +38,45 @@ class MongoPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        self.db[self.collection_name].insert_one(dict(item))
+        if item['publication_id'] in self.ids_seen:
+            raise DropItem("Duplicate item found: %s" % item)
+        elif item['published']<self.publication_min_date:
+            raise DropItem("Old publication found: %s" % item)
+        else:
+            self.ids_seen.add(item['publication_id'])
+            self.db[self.mongo_collection].insert_one(dict(item))
         return item
 
 
-class JsonWriterPipeline(object):
-    """Pipeline for writing to a file in JSON like notation"""
-    def __init__(self):
-        self.file = open('items.json', 'wb')
-
-    def process_item(self, item, spider):
-        line = json.dumps(dict(item)) + "\n"
-        self.file.write(line)
-        return item
+#  IT NOT USED FOR THE MOMENT> IT SHOULD BE UPDATED BEFORE USE.
+# class JsonWriterPipeline(object):
+#     """Pipeline for writing to a file in JSON like notation"""
+#     def __init__(self):
+#         self.file = open('items.json', 'wb')
+#
+#     def process_item(self, item, spider):
+#         line = json.dumps(dict(item)) + "\n"
+#         self.file.write(line)
+#         return item
 
 
 class KafkaPipeline(object):
     """Pipeline for writing to a Mongo DB"""
 
-    def __init__(self, kafka_server, kafka_topic):
+    def __init__(self, kafka_server, kafka_topic, publication_min_date):
         self.kafka_server = kafka_server
         self.kafka_topic = kafka_topic
+        self.publication_min_date=publication_min_date
+        self.ids_seen=set()
 
     @classmethod
     def from_crawler(cls, crawler):
+        kafka_settings=crawler.settings.get('KAFKA')
+        y, m, d = [int(t) for t in kafka_settings.get('publication_min_date').split('-')]
         return cls(
-            kafka_server=crawler.settings.get('KAFKA_SERVER'),
-            kafka_topic=crawler.settings.get('KAFKA_TOPIC')
+            kafka_server=kafka_settings.get('server'),
+            kafka_topic=kafka_settings.get('topic'),
+            publication_min_date = datetime.date(y, m, d).isoformat().encode('utf-8')
         )
 
     def open_spider(self, spider):
@@ -68,12 +86,17 @@ class KafkaPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        key=item['publication_id']
-        key_bytes = key.encode("utf-8")
-        value_bytes = dumps(item).encode("utf-8")
-        self.producer.send(self.kafka_topic, key=key_bytes, value=value_bytes)
-        self.producer.flush()
-        return item
+        if item['publication_id'] in self.ids_seen:
+            raise DropItem("Duplicate item found: %s" % item)
+        elif item['published']<self.publication_min_date:
+            raise DropItem("Old publication found: %s" % item)
+        else:
+            self.ids_seen.add(item['publication_id'])
+            key_bytes = item['publication_id'].encode("utf-8")
+            value_bytes = dumps(item).encode("utf-8")
+            self.producer.send(self.kafka_topic, key=key_bytes, value=value_bytes)
+            self.producer.flush()
+            return item
 
 
 # class PostgresPipeline(object):

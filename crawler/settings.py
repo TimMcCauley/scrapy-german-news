@@ -73,8 +73,8 @@ USER_AGENT_CHOICES = [
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'crawler.pipelines.KafkaPipeline':100
-    #'crawler.pipelines.MongoPipeline':200,
+    'crawler.pipelines.KafkaPipeline':100,
+    'crawler.pipelines.MongoPipeline':200
     # 'crawler.pipelines.PostgresPipeline': 300,
     # 'crawler.pipelines.JsonWriterPipeline': 800,
 }
@@ -108,10 +108,17 @@ DATABASE = {
 #HTTPCACHE_IGNORE_HTTP_CODES=[]
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-MONGO_DATABASE='test'
+# MONGO DATABASE TARGET CONFIGURATIONS
+MONGO = {
+    'uri':'mongodb://127.0.0.1:27017',
+    'db':'german_news',
+    'collection':'publications',
+    'publication_min_date':'2019-1-1'
+}
 
-MONGO_URI='mongodb://127.0.0.1:27017'
-
-KAFKA_SERVER='localhost:9092'
-
-KAFKA_TOPIC='scraped_news'
+# KAFKA TARGET CONFIGURATIONS
+KAFKA = {
+    'server':'localhost:9092',
+    'topic':'publications',
+    'publication_min_date':'2019-1-1'
+}

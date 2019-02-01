@@ -6,7 +6,7 @@ import datetime
 import json
 import pymongo
 import kafka
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 from scrapy.exceptions import DropItem
 
 
@@ -18,6 +18,10 @@ class MongoPipeline(object):
         self.mongo_collection=mongo_collection
         self.publication_min_date=publication_min_date
         self.ids_seen = set()
+        mongo_collection=pymongo.MongoClient(self.mongo_uri)[self.mongo_db].get_collection(name=self.mongo_collection).find({})
+        for publication in mongo_collection:
+            publication_id=publication['publication_id']
+            self.ids_seen.add(publication_id)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -68,6 +72,12 @@ class KafkaPipeline(object):
         self.kafka_topic = kafka_topic
         self.publication_min_date=publication_min_date
         self.ids_seen=set()
+        # Get already ids of already crawled publications
+        kafka_consumer=kafka.KafkaConsumer(self.kafka_topic, auto_offset_reset='earliest', client_id='scrapy_project',bootstrap_servers=[self.kafka_server], api_version=(0, 10), consumer_timeout_ms=1000)
+        for msg in kafka_consumer:
+            publication_id=loads(msg.value)['publication_id']
+            self.ids_seen.add(publication_id)
+
 
     @classmethod
     def from_crawler(cls, crawler):

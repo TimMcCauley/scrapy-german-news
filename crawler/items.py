@@ -11,7 +11,7 @@ class CrawlerItem(scrapy.Item):
     published = scrapy.Field()
     title = scrapy.Field()
     description = scrapy.Field()
-    text = scrapy.Field()
+    #text = scrapy.Field()
     author = scrapy.Field()
     keywords = scrapy.Field()
     resource = scrapy.Field()

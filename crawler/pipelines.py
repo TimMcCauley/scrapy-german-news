@@ -53,15 +53,15 @@ class MongoPipeline(object):
 
 
 #  IT NOT USED FOR THE MOMENT> IT SHOULD BE UPDATED BEFORE USE.
-# class JsonWriterPipeline(object):
-#     """Pipeline for writing to a file in JSON like notation"""
-#     def __init__(self):
-#         self.file = open('items.json', 'wb')
-#
-#     def process_item(self, item, spider):
-#         line = json.dumps(dict(item)) + "\n"
-#         self.file.write(line)
-#         return item
+class JsonWriterPipeline(object):
+    """Pipeline for writing to a file in JSON like notation"""
+    def __init__(self):
+        self.file = open('items.json', 'wb')
+
+    def process_item(self, item, spider):
+        line = json.dumps(dict(item)) + "\n"
+        self.file.write(line)
+        return item
 
 
 class KafkaPipeline(object):

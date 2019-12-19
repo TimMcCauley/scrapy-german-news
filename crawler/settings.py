@@ -13,6 +13,9 @@ BOT_NAME = 'crawler'
 SPIDER_MODULES = ['crawler.spiders']
 NEWSPIDER_MODULE = 'crawler.spiders'
 
+
+EARLIEST_PUBLISHED = '2018-01-01T00:00:001Z'
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'crawler (+http://www.yourdomain.com)'
 
@@ -49,11 +52,12 @@ DOWNLOAD_DELAY=3
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     # Enable for rotationg user agents
-    # 'crawler.middlewares.RotateUserAgentMiddleware': 110,
+    'crawler.middlewares.RotateUserAgentMiddleware': 110,
 }
 
 # User agents used for rotation (most common agents)
 USER_AGENT_CHOICES = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
     'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0',
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36',
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36',
@@ -73,20 +77,20 @@ USER_AGENT_CHOICES = [
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'crawler.pipelines.KafkaPipeline':100,
-    'crawler.pipelines.MongoPipeline':200
+    #'crawler.pipelines.KafkaPipeline':100,
+    #'crawler.pipelines.MongoPipeline':200
     # 'crawler.pipelines.PostgresPipeline': 300,
-    # 'crawler.pipelines.JsonWriterPipeline': 800,
+     'crawler.pipelines.JsonWriterPipeline': 800,
 }
 
-DATABASE = {
-    'drivername': 'postgres',
-    'host': 'localhost',
-    'port': '5432',
-    'username': 'postgres',
-    'password': 'password',
-    'database': 'crawler'
-}
+# DATABASE = {
+#     'drivername': 'postgres',
+#     'host': 'localhost',
+#     'port': '5432',
+#     'username': 'postgres',
+#     'password': 'password',
+#     'database': 'crawler'
+# }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -109,16 +113,16 @@ DATABASE = {
 #HTTPCACHE_STORAGE='scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # MONGO DATABASE TARGET CONFIGURATIONS
-MONGO = {
-    'uri':'mongodb://127.0.0.1:27017',
-    'db':'german_news',
-    'collection':'publications',
-    'publication_min_date':'2019-1-1'
-}
+# MONGO = {
+#     'uri':'mongodb://127.0.0.1:27017',
+#     'db':'german_news',
+#     'collection':'publications',
+#     'publication_min_date':'2019-1-1'
+# }
 
 # KAFKA TARGET CONFIGURATIONS
-KAFKA = {
-    'server':'localhost:9092',
-    'topic':'publications',
-    'publication_min_date':'2019-1-1'
-}
+# KAFKA = {
+#     'server':'localhost:9092',
+#     'topic':'publications',
+#     'publication_min_date':'2019-1-1'
+# }
